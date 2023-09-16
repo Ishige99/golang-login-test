@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
 	"time"
@@ -31,9 +32,15 @@ func (h *Handlers) createUserHandler(c *gin.Context) {
 
 	// todo: validate mail and password
 
+	// create hash password
+	hashPassword, err := encryptPassword(request.Password)
+	if err != nil {
+		returnError(c, err, http.StatusInternalServerError)
+	}
+
 	user := User{
 		Email:    request.Email,
-		Password: request.Password,
+		Password: hashPassword,
 	}
 
 	// create user
@@ -57,4 +64,12 @@ func returnError(c *gin.Context, err error, status int) {
 		Status:  status,
 	}
 	c.JSONP(status, apiError)
+}
+
+func encryptPassword(password string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(hash), nil
 }
