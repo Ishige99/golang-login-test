@@ -10,3 +10,5 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "root"
       MYSQL_DATABASE: "golang_login_test"
+    volumes:
+      - ./mysql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
