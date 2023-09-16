@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+
+  # MySQLコンテナ
+  mysql:
+    image: mysql:8
+    ports:
+      - "3307:3307"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: "golang_login_test"
