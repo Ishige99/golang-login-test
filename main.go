@@ -1,9 +1,11 @@
 package main
 
 import (
+	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"log"
+	"net/http"
 )
 
 func connectDatabase() (*gorm.DB, error) {
@@ -21,4 +23,13 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// todo: ユーザー作成ハンドラ作成
+	router := gin.Default()
+	router.GET("/hello", helloWorldHandler)
+	router.Run()
+}
+
+func helloWorldHandler(c *gin.Context) {
+	c.JSONP(http.StatusOK, "hello world!")
 }
