@@ -22,6 +22,7 @@ func main() {
 	router := gin.Default()
 	router.GET("/hello", helloWorldHandler)
 	router.POST("/user", h.createUserHandler)
+	router.POST("/user/login", h.loginUserHandler)
 	router.Run()
 }
 

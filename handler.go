@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -28,6 +29,7 @@ func (h *Handlers) createUserHandler(c *gin.Context) {
 
 	if err := c.BindJSON(&request); err != nil {
 		returnError(c, err, http.StatusBadRequest)
+		return
 	}
 
 	// todo: validate mail and password
@@ -36,6 +38,7 @@ func (h *Handlers) createUserHandler(c *gin.Context) {
 	hashPassword, err := encryptPassword(request.Password)
 	if err != nil {
 		returnError(c, err, http.StatusInternalServerError)
+		return
 	}
 
 	user := User{
@@ -46,6 +49,38 @@ func (h *Handlers) createUserHandler(c *gin.Context) {
 	// create user
 	if err := h.db.Table("user").Create(&user).Error; err != nil {
 		returnError(c, err, http.StatusInternalServerError)
+		return
+	}
+
+	c.JSONP(http.StatusOK, user)
+}
+
+func (h *Handlers) loginUserHandler(c *gin.Context) {
+	var request struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	if err := c.BindJSON(&request); err != nil {
+		returnError(c, err, http.StatusBadRequest)
+		return
+	}
+
+	// todo: validate mail and password
+
+	// get user
+	var user User
+	if err := h.db.Table("user").
+		Where("email = ?", request.Email).
+		Scan(&user).Error; err != nil {
+		returnError(c, err, http.StatusInternalServerError)
+		return
+	}
+
+	// compare hash password
+	if err := compareHashPassword(user.Password, request.Password); err != nil {
+		returnError(c, errors.New("password is invalid"), http.StatusBadRequest)
+		return
 	}
 
 	c.JSONP(http.StatusOK, user)
@@ -72,4 +107,11 @@ func encryptPassword(password string) (string, error) {
 		return "", err
 	}
 	return string(hash), nil
+}
+
+func compareHashPassword(hashedPassword, requestPassword string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(requestPassword)); err != nil {
+		return err
+	}
+	return nil
 }
