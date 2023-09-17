@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
 	"time"
@@ -32,7 +31,10 @@ func (h *Handlers) createUserHandler(c *gin.Context) {
 		return
 	}
 
-	// todo: validate mail and password
+	if err := validateParameter(request.Email, request.Password); err != nil {
+		returnError(c, err, http.StatusBadRequest)
+		return
+	}
 
 	// create hash password
 	hashPassword, err := encryptPassword(request.Password)
@@ -66,7 +68,10 @@ func (h *Handlers) loginUserHandler(c *gin.Context) {
 		return
 	}
 
-	// todo: validate mail and password
+	if err := validateParameter(request.Email, request.Password); err != nil {
+		returnError(c, err, http.StatusBadRequest)
+		return
+	}
 
 	// get user
 	var user User
@@ -99,19 +104,4 @@ func returnError(c *gin.Context, err error, status int) {
 		Status:  status,
 	}
 	c.JSONP(status, apiError)
-}
-
-func encryptPassword(password string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", err
-	}
-	return string(hash), nil
-}
-
-func compareHashPassword(hashedPassword, requestPassword string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(requestPassword)); err != nil {
-		return err
-	}
-	return nil
 }
