@@ -8,8 +8,3 @@ CREATE TABLE `user` (
     `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
 );
-
-INSERT INTO `user` (`email`, `password`) VALUES
-    ('one@email.com', 'one'),
-    ('two@email.com', 'two'),
-    ('three@email.com', 'three');
