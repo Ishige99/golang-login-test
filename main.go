@@ -27,7 +27,7 @@ func main() {
 }
 
 func connectDatabase() (*gorm.DB, error) {
-	dsn := "root:root@tcp(127.0.0.1:3306)/golang_login_test"
+	dsn := "root:root@tcp(127.0.0.1:3306)/golang_login_test?charset=utf8&parseTime=true"
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
 		return nil, err
