@@ -80,6 +80,7 @@ func (h *Handlers) loginUserHandler(c *gin.Context) {
 		return
 	}
 
+	// validate parameter
 	if err := validateParameter(request.Email, request.Password); err != nil {
 		returnError(c, err, http.StatusBadRequest)
 		return
@@ -94,7 +95,7 @@ func (h *Handlers) loginUserHandler(c *gin.Context) {
 		return
 	}
 
-	// compare hash password
+	// check password
 	if err := compareHashPassword(user.Password, request.Password); err != nil {
 		returnError(c, errors.New("password is invalid"), http.StatusBadRequest)
 		return

@@ -9,6 +9,7 @@ import (
 )
 
 func encryptPassword(password string) (string, error) {
+	// パスワードの文字列をハッシュ化する
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
@@ -17,6 +18,7 @@ func encryptPassword(password string) (string, error) {
 }
 
 func compareHashPassword(hashedPassword, requestPassword string) error {
+	// パスワードの文字列をハッシュ化して、既に登録されているハッシュ化したパスワードと比較します
 	if err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(requestPassword)); err != nil {
 		return err
 	}

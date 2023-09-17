@@ -8,17 +8,16 @@ import (
 )
 
 func main() {
-	// connect MySQL
+	// gormを使用してMySQL接続
 	db, err := connectDatabase()
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	h := &Handlers{
 		db: db,
 	}
 
-	// router
+	// ginルーター作成
 	router := gin.Default()
 	router.GET("/hello", helloWorldHandler)
 	router.POST("/user", h.createUserHandler)
