@@ -31,8 +31,20 @@ func (h *Handlers) createUserHandler(c *gin.Context) {
 		return
 	}
 
+	// validate parameter
 	if err := validateParameter(request.Email, request.Password); err != nil {
 		returnError(c, err, http.StatusBadRequest)
+		return
+	}
+
+	// check email exist
+	alreadyExistEmail, err := getAlreadyExistEmail(h.db, request.Email)
+	if err != nil {
+		if alreadyExistEmail {
+			returnError(c, err, http.StatusBadRequest)
+			return
+		}
+		returnError(c, err, http.StatusInternalServerError)
 		return
 	}
 

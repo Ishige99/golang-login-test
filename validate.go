@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 	"net/mail"
 	"regexp"
 )
@@ -47,4 +48,22 @@ func validatePassword(password string) error {
 		return errors.New("password is invalid. please enter alphanumeric characters between 4 and 12 characters")
 	}
 	return nil
+}
+
+func getAlreadyExistEmail(db *gorm.DB, email string) (bool, error) {
+	var alreadyExistEmail string
+	result := db.Select("email").
+		Table("user").
+		Where("email = ?", email).
+		Scan(&alreadyExistEmail)
+
+	if result.Error != nil {
+		return false, result.Error
+	}
+
+	if result.RowsAffected >= 1 {
+		return true, errors.New("email is already exist")
+	}
+
+	return false, nil
 }
